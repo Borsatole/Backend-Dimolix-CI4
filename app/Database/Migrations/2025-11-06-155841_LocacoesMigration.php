@@ -40,6 +40,20 @@ class LocacoesMigration extends Migration
                 'type' => 'DECIMAL',
                 'constraint' => '10,2',
             ],
+            'forma_pagamento' => [
+                'type' => 'VARCHAR',
+                'constraint' => 80,
+                'null' => true,
+            ],
+            'observacoes' => [
+                'type' => 'TEXT',
+                'null' => true,
+            ],
+            'status' => [
+                'type' => 'ENUM',
+                'constraint' => ['ativo', 'finalizado'],
+                'default' => 'ativo',
+            ],
             'created_at' => [
                 'type' => 'DATETIME',
                 'null' => true

@@ -4,33 +4,25 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class LocacoesModel extends Model
+class ItensLocacoesModel extends Model
 {
-    protected $table            = 'locacoes';
+    protected $table            = 'itenslocacoes';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        'cliente_id',
-        'locacao_item_id',
-        'endereco_id',
-        'data_inicio',
-        'data_fim',
-        'preco_total',
-        'forma_pagamento',
-        'observacoes',
-        'status',
+        'item',
+        'categoria',
+        'preco_diaria',
     ];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
 
     protected array $casts = [
-        'cliente_id' => 'int',
-        'locacao_item_id' => 'int',
-        'endereco_id' => 'int',
+        'item' => 'int',
     ];
     protected array $castHandlers = [];
 
@@ -43,7 +35,7 @@ class LocacoesModel extends Model
 
     // Validation
     protected $validationRules      = [
-        'forma_pagamento' => 'in_list[debito,credito,dinheiro]|nullable',
+        
     ];
     protected $validationMessages   = [];
     protected $skipValidation       = false;
