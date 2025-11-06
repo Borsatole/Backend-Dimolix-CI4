@@ -2,17 +2,22 @@
 
 namespace App\Services;
 
-use App\Models\ClienteModel;        
+use App\Models\ClienteModel;
+use App\Models\EnderecosModel;
+
 use App\Exceptions\ClienteException;
 
 class ClienteService
 {
     private $clientesModel;
+    private $enderecosModel;
     private $db;
 
     public function __construct()
     {
         $this->clientesModel = new ClienteModel();
+        $this->enderecosModel = new EnderecosModel();
+
         $this->db = \Config\Database::connect();
     }
 
@@ -32,13 +37,15 @@ class ClienteService
      */
     public function buscar(int $id): array
     {
-        $nivel = $this->clientesModel->buscarPorId($id);
-
-        if (!$nivel) {
+        $registro = $this->clientesModel->buscarPorId($id);
+        $enderecos = $this->enderecosModel->buscarPorCliente($id);
+        $registro['enderecos'] = $enderecos ?? [];
+        
+        if (!$registro) {
             throw ClienteException::naoEncontrado();
         }
 
-        return $nivel;
+        return $registro;
     }
 
     /**

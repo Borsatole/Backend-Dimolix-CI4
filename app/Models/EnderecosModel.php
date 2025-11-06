@@ -62,4 +62,10 @@ class EnderecosModel extends Model
     return $this->where('cliente_id', $clienteId)->delete();
 }
 
+    public function buscarPorCliente(int $clienteId): array
+    {
+        return $this->where('cliente_id', $clienteId)->findAll();
+    }
+
+
 }

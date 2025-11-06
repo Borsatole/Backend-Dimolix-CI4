@@ -60,18 +60,20 @@ class ClienteModel extends Model
 
     // Callback para deletar endereços associados ao cliente na tabela enderecos
     protected function deletarEnderecos(array $data)
-{
-    $enderecosModel = new \App\Models\EnderecosModel();
+    {
+        $enderecosModel = new \App\Models\EnderecosModel();
 
-    $id = $data['id'] ?? null;
+        $id = $data['id'] ?? null;
 
-    if ($id !== null) {
-        $clienteId = is_array($id) ? $id[0] : $id;
-        $enderecosModel->deletarPorCliente($clienteId);
+        if ($id !== null) {
+            $clienteId = is_array($id) ? $id[0] : $id;
+            $enderecosModel->deletarPorCliente($clienteId);
+        }
+
+        return $data;
     }
 
-    return $data;
-}
+
 
 
 
