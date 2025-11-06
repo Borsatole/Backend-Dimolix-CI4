@@ -4,11 +4,12 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 use App\Traits\PaginacaoTrait;
-
+use App\Traits\CrudTrait;
 
 class ClienteModel extends Model
 {
     use PaginacaoTrait;
+    use CrudTrait;
 
     protected $table = 'clientes';
     protected $primaryKey = 'id';
@@ -20,6 +21,7 @@ class ClienteModel extends Model
 
     protected array $casts = [
         'id' => 'int',
+        
     ];
 
     protected $allowedFields = [
@@ -28,8 +30,7 @@ class ClienteModel extends Model
         'telefone',
         'celular',
         'email',
-        'cidade',
-        'estado',
+        'observacao',
         'created_at',
         'updated_at'
     ];
@@ -45,11 +46,34 @@ class ClienteModel extends Model
     protected $validationMessages = [];
     protected $skipValidation = true;
 
+    // Callbacks
+    protected $allowCallbacks = true;
+    protected $beforeInsert   = [];
+    protected $afterInsert    = [];
+    protected $beforeUpdate   = [];
+    protected $afterUpdate    = [];
+    protected $beforeFind     = [];
+    protected $afterFind      = [];
+    protected $beforeDelete   = [];
+    protected $afterDelete = ['deletarEnderecos'];
 
-    public function buscarPorId(int $id): ?array
-    {
-        return $this->find($id);
+
+    // Callback para deletar endereços associados ao cliente na tabela enderecos
+    protected function deletarEnderecos(array $data)
+{
+    $enderecosModel = new \App\Models\EnderecosModel();
+
+    $id = $data['id'] ?? null;
+
+    if ($id !== null) {
+        $clienteId = is_array($id) ? $id[0] : $id;
+        $enderecosModel->deletarPorCliente($clienteId);
     }
+
+    return $data;
+}
+
+
 
 }
 

@@ -22,12 +22,29 @@ class UsuarioService
     {
         $resultado = $this->usuariosModel->listarComPaginacao($limite, $pagina, $filtros);
 
-        foreach ($resultado as &$usuario) {
+        foreach ($resultado['registros'] as &$usuario) {
             unset($usuario['senha']);
         }
 
         return $resultado;
+    }
 
+    public function buscar(int $id): array
+    {
+        $registro = $this->usuariosModel->buscarPorId($id);
+
+        if (empty($registro)) {
+            throw UsuarioException::naoEncontrado();
+        }
+
+        unset($registro['senha']);
+
+
+        if (!$registro) {
+            throw UsuarioException::naoEncontrado();
+        }
+
+        return $registro;
     }
 
 

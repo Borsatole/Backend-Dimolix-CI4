@@ -49,4 +49,21 @@ class UsuarioController2 extends BaseController
         }
 
     }
+
+    public function show(int $id)
+    {
+        try {
+            $registro = $this->UsuarioService->buscar($id);
+            return $this->response->setJSON([
+                'success' => true,
+                'registro' => $registro,
+            ]);
+
+        } catch (UsuarioException $e) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ])->setStatusCode($e->getCode());
+        }
+    }
 }

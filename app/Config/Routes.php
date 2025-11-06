@@ -24,25 +24,25 @@ $routes->group('usuarios', ['filter' => 'autenticacao'], function ($routes) {
 
     $routes->post(
         '',
-        'UsuarioController::create',
+        'UsuarioController2::create',
         ['filter' => 'permission:usuario.criar']
     );
 
     $routes->get(
         '(:num)',
-        'UsuarioController::show/$1',
+        'UsuarioController2::show/$1',
         ['filter' => 'permission:usuario.visualizar']
     );
 
     $routes->post(
         '(:num)',
-        'UsuarioController::update/$1',
+        'UsuarioController2::update/$1',
         ['filter' => 'permission:usuario.editar']
     );
 
     $routes->delete(
         '(:num)',
-        'UsuarioController::delete/$1',
+        'UsuarioController2::delete/$1',
         ['filter' => 'permission:usuario.excluir']
     );
 

@@ -2,96 +2,116 @@
 
 namespace App\Services;
 
-use App\Models\ClienteModel;
+use App\Models\ClienteModel;        
 use App\Exceptions\ClienteException;
-use Config\Database;
 
 class ClienteService
 {
-    private ClienteModel $clientesModel;
+    private $clientesModel;
     private $db;
 
     public function __construct()
     {
         $this->clientesModel = new ClienteModel();
-        $this->db = Database::connect();
+        $this->db = \Config\Database::connect();
     }
 
     /**
-     * Lista clientes com paginação e filtros opcionais (datas inclusas)
+     * Lista todos os níveis com paginação e permissões
      */
     public function listar(int $limite = 10, int $pagina = 1, array $filtros = [], ?string $data_inicio = null, ?string $data_fim = null): array
     {
-        return $this->clientesModel->listarComPaginacao(
-            $limite,
-            $pagina,
-            $filtros,
-            $data_inicio,
-            $data_fim
-        );
+        $registros = $this->clientesModel->listarComPaginacao($limite, $pagina, $filtros, $data_inicio, $data_fim);
+
+
+        return $registros;
     }
 
     /**
-     * Busca um cliente pelo ID
+     * Busca um nível específico com suas permissões
      */
     public function buscar(int $id): array
     {
-        $cliente = $this->clientesModel->buscarPorId($id);
+        $nivel = $this->clientesModel->buscarPorId($id);
 
-        if (!$cliente) {
+        if (!$nivel) {
             throw ClienteException::naoEncontrado();
         }
 
-        return $cliente;
+        return $nivel;
     }
 
     /**
-     * Cria um novo cliente
+     * Cria um novo nível com todas as permissões (allow = 0)
+     * 
+     * AQUI é onde a ORQUESTRAÇÃO acontece:
+     * 1. Valida
+     * 2. Cria nível
+     * 3. Vincula permissões
+     * 4. Retorna nível completo
      */
     public function criar(array $dados): array
     {
+        // 1️⃣ Validação de negócio
         if (empty($dados['nome'])) {
             throw ClienteException::nomeObrigatorio();
         }
 
+        // 3️⃣ Inicia transação (garante atomicidade)
         $this->db->transStart();
 
         try {
-            $this->clientesModel->insert($dados);
-            $clienteId = $this->clientesModel->getInsertID();
+            // 4️⃣ Cria o nível (Model apenas insere)
+            $nivelId = $this->clientesModel->criar(['nome' => $dados['nome']]);
 
+            if (!$nivelId) {
+                throw ClienteException::erroCriar($this->clientesModel->errors());
+            }
+
+            
+
+            // 6️⃣ Finaliza transação
             $this->db->transComplete();
 
             if ($this->db->transStatus() === false) {
                 throw ClienteException::erroCriar();
             }
 
-            return $this->buscar($clienteId);
+            // 7️⃣ Retorna o nível completo com permissões
+            return $this->buscar($nivelId);
 
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
             $this->db->transRollback();
             throw $e;
         }
     }
 
     /**
-     * Atualiza um cliente existente
+     * Atualiza um nível existente (nome e/ou permissões)
      */
     public function atualizar(int $id, array $dados): array
     {
-        $clienteExistente = $this->clientesModel->buscarPorId($id);
+        // 1️⃣ Validação
+        if (empty($dados['nome'])) {
+            throw ClienteException::nomeObrigatorio();
+        }
 
-        if (!$clienteExistente) {
+        // 2️⃣ Verifica se existe
+        $nivelExistente = $this->clientesModel->buscarPorId($id);
+        if (!$nivelExistente) {
             throw ClienteException::naoEncontrado();
         }
 
+        // 4️⃣ Inicia transação
         $this->db->transStart();
 
         try {
-            if (!$this->clientesModel->update($id, $dados)) {
+            // 5️⃣ Atualiza o nome
+            if (!$this->clientesModel->atualizar($id, ['nome' => $dados['nome']])) {
                 throw ClienteException::erroAtualizar($this->clientesModel->errors());
             }
 
+        
             $this->db->transComplete();
 
             if ($this->db->transStatus() === false) {
@@ -100,41 +120,46 @@ class ClienteService
 
             return $this->buscar($id);
 
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
             $this->db->transRollback();
             throw $e;
         }
     }
 
     /**
-     * Exclui um cliente
+     * Deleta um nível e suas permissões
      */
     public function deletar(int $id): bool
     {
-        $cliente = $this->clientesModel->buscarPorId($id);
-
-        if (!$cliente) {
+        // 1️⃣ Verifica se existe
+        if (!$this->clientesModel->buscarPorId($id)) {
             throw ClienteException::naoEncontrado();
         }
 
+        // 2️⃣ Inicia transação
         $this->db->transStart();
 
         try {
-            if (!$this->clientesModel->delete($id)) {
+           
+
+            // 4️⃣ Remove o nível
+            if (!$this->clientesModel->deletar($id)) {
                 throw ClienteException::erroDeletar();
             }
 
             $this->db->transComplete();
 
             if ($this->db->transStatus() === false) {
-                throw ClienteException::erroDeletar();
+                throw ClienteException::erroDeletar();  
             }
 
             return true;
 
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
             $this->db->transRollback();
             throw $e;
         }
     }
+
+   
 }

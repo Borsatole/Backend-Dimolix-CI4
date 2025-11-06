@@ -28,6 +28,14 @@ class ClienteController extends BaseController
             $data_fim = $this->request->getGet('data_fim');
             $data_fim = !empty($data_fim) ? $data_fim : null;
 
+            $order_by = $this->request->getGet('order_by');
+            $order_by = !empty($order_by) ? $order_by : 'id';
+
+            $order_dir = $this->request->getGet('order_dir');
+            $order_dir = !empty($order_dir) ? $order_dir : 'asc';
+
+
+
             // Pega todos os filtros da URL (exceto limite/pagina)
             $filtros = $this->request->getGet();
 
@@ -36,7 +44,9 @@ class ClienteController extends BaseController
                 $filtros['limite'],
                 $filtros['pagina'],
                 $filtros['data_inicio'],
-                $filtros['data_fim']
+                $filtros['data_fim'],
+                $filtros['order_by'],
+                $filtros['order_dir']
             );
 
             $resultado = $this->clienteService->listar($limite, $pagina, $filtros, $data_inicio, $data_fim);

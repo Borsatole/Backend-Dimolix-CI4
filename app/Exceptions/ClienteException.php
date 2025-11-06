@@ -15,6 +15,7 @@ class ClienteException extends Exception
     {
         return new self('O campo nome é obrigatório', 400);
     }
+    
 
     public static function erroCriar(array $errors = []): self
     {
