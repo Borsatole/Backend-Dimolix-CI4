@@ -3,9 +3,13 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use App\Traits\CrudTrait;
+
 
 class EnderecosModel extends Model
 {
+    use CrudTrait;
+    
     protected $table            = 'enderecos';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;

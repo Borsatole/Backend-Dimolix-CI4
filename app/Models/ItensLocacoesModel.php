@@ -16,6 +16,7 @@ class ItensLocacoesModel extends Model
         'item',
         'categoria',
         'preco_diaria',
+        'status',
     ];
 
     protected bool $allowEmptyInserts = false;

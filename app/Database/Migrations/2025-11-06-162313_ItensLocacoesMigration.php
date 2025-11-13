@@ -27,6 +27,11 @@ class ItensLocacoesMigration extends Migration
                 'type' => 'DECIMAL',
                 'constraint' => '10,2',
             ],
+            'status' => [
+                'type'       => "ENUM('disponivel','locado','indisponivel')",
+                'default'    => 'disponivel',
+                'null'       => false,
+            ],
             'created_at' => [
                 'type' => 'DATETIME',
                 'null' => true

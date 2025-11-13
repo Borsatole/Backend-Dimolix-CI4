@@ -24,10 +24,30 @@ class ClienteService
     /**
      * Lista todos os níveis com paginação e permissões
      */
+    // public function listar(int $limite = 10, int $pagina = 1, array $filtros = [], ?string $data_inicio = null, ?string $data_fim = null): array
+    // {
+    //     // PaginacaoSimples
+    //     $registros = $this->clientesModel->listarComPaginacao($limite, $pagina, $filtros, $data_inicio, $data_fim);
+
+    //     return $registros;
+    // }
+
     public function listar(int $limite = 10, int $pagina = 1, array $filtros = [], ?string $data_inicio = null, ?string $data_fim = null): array
     {
+        // Obtém os registros paginados (clientes)
         $registros = $this->clientesModel->listarComPaginacao($limite, $pagina, $filtros, $data_inicio, $data_fim);
 
+        
+
+        // Verifica se o resultado contém a chave 'registros' (caso seu método retorne com paginação)
+        if (isset($registros['registros']) && is_array($registros['registros'])) {
+            foreach ($registros['registros'] as &$cliente) {
+                // Busca os endereços desse cliente
+                $enderecos = $this->enderecosModel->buscarPorCliente($cliente['id']);
+                // Adiciona o campo no cliente
+                $cliente['enderecos'] = $enderecos ?? [];
+            }
+        }
 
         return $registros;
     }
@@ -68,13 +88,40 @@ class ClienteService
         $this->db->transStart();
 
         try {
-            // 4️⃣ Cria o nível (Model apenas insere)
-            $nivelId = $this->clientesModel->criar(['nome' => $dados['nome']]);
+            $dadosCliente = [
+                'nome' => $dados['nome'] ?? null,
+                'razao_social' => $dados['razao_social'] ?? null,
+                'email' => $dados['email'] ?? null,
+                'telefone' => $dados['telefone'] ?? null,
+                'celular' => $dados['celular'] ?? null,
+                'observacao' => $dados['observacao'] ?? null,
+            ];
 
-            if (!$nivelId) {
+            
+
+            if (!$this->clientesModel->criar($dadosCliente)) {
                 throw ClienteException::erroCriar($this->clientesModel->errors());
+            };
+            
+            if (!empty($dados['enderecos'])) {
+                foreach ($dados['enderecos'] as $endereco) {
+                    $dadosEndereco = [
+                        'cliente_id' => $this->clientesModel->getInsertID(),
+                        'tipo' => $endereco['tipo'] ?? null,
+                        'logradouro' => $endereco['logradouro'] ?? null,
+                        'numero' => $endereco['numero'] ?? null,
+                        'complemento' => $endereco['complemento'] ?? null,
+                        'bairro' => $endereco['bairro'] ?? null,
+                        'cidade' => $endereco['cidade'] ?? null,
+                        'estado' => $endereco['estado'] ?? null,
+                        'cep' => $endereco['cep'] ?? null,
+                    ];
+                    
+                    if (!$this->enderecosModel->criar($dadosEndereco)) {
+                        throw ClienteException::erroCriar($this->enderecosModel->errors());
+                    }
+                }
             }
-
             
 
             // 6️⃣ Finaliza transação
@@ -85,7 +132,7 @@ class ClienteService
             }
 
             // 7️⃣ Retorna o nível completo com permissões
-            return $this->buscar($nivelId);
+            return $this->buscar($this->clientesModel->getInsertID());
 
         } catch (\Exception $e) {
             $this->db->transRollback();
@@ -113,8 +160,16 @@ class ClienteService
         $this->db->transStart();
 
         try {
-            // 5️⃣ Atualiza o nome
-            if (!$this->clientesModel->atualizar($id, ['nome' => $dados['nome']])) {
+            $dadosCliente = [
+                'nome' => $dados['nome'] ?? null,
+                'razao_social' => $dados['razao_social'] ?? null,
+                'email' => $dados['email'] ?? null,
+                'telefone' => $dados['telefone'] ?? null,
+                'celular' => $dados['celular'] ?? null,
+                'observacao' => $dados['observacao'] ?? null,
+            ];
+
+            if (!$this->clientesModel->atualizar($id, $dadosCliente)) {
                 throw ClienteException::erroAtualizar($this->clientesModel->errors());
             }
 

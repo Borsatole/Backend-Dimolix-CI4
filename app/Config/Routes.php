@@ -82,6 +82,41 @@ $routes->group('clientes', ['filter' => 'autenticacao'], function ($routes) {
 
 });
 
+$routes->group('enderecos', ['filter' => 'autenticacao'], function ($routes) {
+    $routes->get(
+        '',
+        'EnderecosController::index',
+        ['filter' => 'permission:usuario.visualizar']
+    );
+
+    $routes->post(
+        '',
+        'EnderecosController::create',
+        ['filter' => 'permission:usuario.criar']
+    );
+
+    $routes->get(
+        '(:num)',
+        'EnderecosController::show/$1',
+        ['filter' => 'permission:usuario.visualizar']
+    );
+
+    $routes->put(
+        '(:num)',
+        'EnderecosController::update/$1',
+        ['filter' => 'permission:usuario.editar']
+    );
+
+    $routes->delete(
+        '(:num)',
+        'EnderecosController::delete/$1',
+        ['filter' => 'permission:usuario.excluir']
+    );
+
+});
+
+
+
 // Rotas de Niveis
 $routes->group('papeis', ['filter' => 'autenticacao'], function ($routes) {
     $routes->get(

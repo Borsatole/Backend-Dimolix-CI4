@@ -10,6 +10,7 @@ trait PaginacaoTrait
         array $filtros = [],
         ?string $data_inicio = null,
         ?string $data_fim = null,
+        
         string $campoData = 'created_at'
     ): array {
         $builder = $this;
