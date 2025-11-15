@@ -21,7 +21,6 @@ class ClienteModel extends Model
 
     protected array $casts = [
         'id' => 'int',
-        
     ];
 
     protected $allowedFields = [
@@ -48,13 +47,13 @@ class ClienteModel extends Model
 
     // Callbacks
     protected $allowCallbacks = true;
-    protected $beforeInsert   = [];
-    protected $afterInsert    = [];
-    protected $beforeUpdate   = [];
-    protected $afterUpdate    = [];
-    protected $beforeFind     = [];
-    protected $afterFind      = [];
-    protected $beforeDelete   = [];
+    protected $beforeInsert = [];
+    protected $afterInsert = [];
+    protected $beforeUpdate = [];
+    protected $afterUpdate = [];
+    protected $beforeFind = [];
+    protected $afterFind = [];
+    protected $beforeDelete = [];
     protected $afterDelete = ['deletarEnderecos'];
 
 

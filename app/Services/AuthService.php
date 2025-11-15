@@ -58,16 +58,16 @@ class AuthService
         $menu = $usuario['ativo'] ? $this->buscaMenu($usuario) : [];
         $expirationTime = $payload['exp'];
 
-        enviarEmailSimples(
-            // para
-            'vitoriabotacini7@gmail.com',
+        // enviarEmailSimples(
+        //     // para
+        //     'vitoriabotacini7@gmail.com',
 
-            // assunto
-            '🎉 O soca é do paaaai',
+        //     // assunto
+        //     '🎉 O soca é do paaaai',
 
-            // mensagem
-            "Olá Selma Piruleibe, Só pra falar que o xoca é do pai"
-        );
+        //     // mensagem
+        //     "Olá Selma Piruleibe, Só pra falar que o xoca é do pai"
+        // );
 
 
         // $sucesso = enviarEmailTemplate(
@@ -106,8 +106,8 @@ class AuthService
         return [
             'iss' => base_url(),
             'iat' => time(),
-            'exp' => time() + 3600,
-            // 'exp' => time() + 30,
+            // 'exp' => time() + 3600,
+            'exp' => time() + 43200,
             'sub' => $usuario['id'],
             'nivel' => $usuario['nivel']
         ];

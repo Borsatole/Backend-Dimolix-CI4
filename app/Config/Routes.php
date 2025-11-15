@@ -82,40 +82,105 @@ $routes->group('clientes', ['filter' => 'autenticacao'], function ($routes) {
 
 });
 
+// Rotas de Enderecos
 $routes->group('enderecos', ['filter' => 'autenticacao'], function ($routes) {
     $routes->get(
         '',
         'EnderecosController::index',
-        ['filter' => 'permission:usuario.visualizar']
+        ['filter' => 'permission:enderecos.visualizar']
     );
 
     $routes->post(
         '',
         'EnderecosController::create',
-        ['filter' => 'permission:usuario.criar']
+        ['filter' => 'permission:enderecos.criar']
     );
 
     $routes->get(
         '(:num)',
         'EnderecosController::show/$1',
-        ['filter' => 'permission:usuario.visualizar']
+        ['filter' => 'permission:enderecos.visualizar']
     );
 
     $routes->put(
         '(:num)',
         'EnderecosController::update/$1',
-        ['filter' => 'permission:usuario.editar']
+        ['filter' => 'permission:enderecos.editar']
     );
 
     $routes->delete(
         '(:num)',
         'EnderecosController::delete/$1',
-        ['filter' => 'permission:usuario.excluir']
+        ['filter' => 'permission:enderecos.excluir']
     );
 
 });
 
+// Rota de estoque
+$routes->group('estoque', ['filter' => 'autenticacao'], function ($routes) {
+    $routes->get(
+        '',
+        'ItensLocacoesController::index',
+        ['filter' => 'permission:enderecos.visualizar']
+    );
 
+    $routes->post(
+        '',
+        'ItensLocacoesController::create',
+        ['filter' => 'permission:enderecos.criar']
+    );
+
+    $routes->get(
+        '(:num)',
+        'ItensLocacoesController::show/$1',
+        ['filter' => 'permission:enderecos.visualizar']
+    );
+
+    $routes->put(
+        '(:num)',
+        'ItensLocacoesController::update/$1',
+        ['filter' => 'permission:enderecos.editar']
+    );
+
+    $routes->delete(
+        '(:num)',
+        'ItensLocacoesController::delete/$1',
+        ['filter' => 'permission:enderecos.excluir']
+    );
+});
+
+// Rota de locacoes
+$routes->group('locacoes', ['filter' => 'autenticacao'], function ($routes) {
+    $routes->get(
+        '',
+        'LocacoesController::index',
+        ['filter' => 'permission:enderecos.visualizar']
+    );
+
+    $routes->post(
+        '',
+        'LocacoesController::create',
+        ['filter' => 'permission:enderecos.criar']
+    );
+
+    $routes->get(
+        '(:num)',
+        'LocacoesController::show/$1',
+        ['filter' => 'permission:enderecos.visualizar']
+    );
+
+    $routes->put(
+        '(:num)',
+        'LocacoesController::update/$1',
+        ['filter' => 'permission:enderecos.editar']
+    );
+
+    $routes->delete(
+        '(:num)',
+        'LocacoesController::delete/$1',
+        ['filter' => 'permission:enderecos.excluir']
+    );
+});
 
 // Rotas de Niveis
 $routes->group('papeis', ['filter' => 'autenticacao'], function ($routes) {

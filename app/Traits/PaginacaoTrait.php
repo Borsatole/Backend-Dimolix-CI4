@@ -47,16 +47,15 @@ trait PaginacaoTrait
 
     public function listarSemPaginacao(array $filtros = []): array
     {
-        $builder = $this;
-
+        // Remove o builder() e usa diretamente o Model ($this)
         foreach ($filtros as $campo => $valor) {
             if (!empty($valor)) {
-                $builder->like($campo, $valor);
+                $this->like($campo, $valor);
             }
         }
 
         return [
-            'registros' => $builder->findAll(),
+            'registros' => $this->findAll(),
         ];
     }
 
