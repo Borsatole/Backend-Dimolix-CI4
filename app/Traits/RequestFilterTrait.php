@@ -20,10 +20,10 @@ trait RequestFilterTrait
     {
         // Valores padrão das opções
         $options = array_merge([
-            'pagination' => true,
-            'dates' => true,
-            'ordering' => true,
-            'dynamic' => true
+            'pagination' => false,
+            'dates' => false,
+            'ordering' => false,
+            'dynamic' => false
         ], $options);
 
         $result = [

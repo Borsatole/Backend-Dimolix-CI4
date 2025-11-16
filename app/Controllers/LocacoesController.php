@@ -6,9 +6,11 @@ use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Services\LocacoesService;
 use App\Exceptions\LocacoesException;
+use App\Traits\RequestFilterTrait;
 
 class LocacoesController extends BaseController
 {
+    use RequestFilterTrait;
     private $LocacoesService;
     public function __construct()
     {
@@ -18,41 +20,22 @@ class LocacoesController extends BaseController
     public function index()
     {
         try {
-            $limite = intval($this->request->getGet('limite') ?? 10);
-            $pagina = intval($this->request->getGet('pagina') ?? 1);
 
-            $data_inicio = $this->request->getGet('data_inicio');
-            $data_inicio = !empty($data_inicio) ? $data_inicio : null;
+            // Aqui pego os parametros da url e no optional passo os filtros ativos
+            $params = $this->getRequestFilters($this->request, [
+                'pagination' => true
+            ]);
 
-            $data_fim = $this->request->getGet('data_fim');
-            $data_fim = !empty($data_fim) ? $data_fim : null;
 
-            $order_by = $this->request->getGet('order_by');
-            $order_by = !empty($order_by) ? $order_by : 'id';
 
-            $order_dir = $this->request->getGet('order_dir');
-            $order_dir = !empty($order_dir) ? $order_dir : 'asc';
-
-            // Pega todos os filtros da URL (exceto limite/pagina)
-            $filtros = $this->request->getGet();
-
-            // Remove filtros inválidos
-            unset(
-                $filtros['limite'],
-                $filtros['pagina'],
-                $filtros['data_inicio'],
-                $filtros['data_fim'],
-                $filtros['order_by'],
-                $filtros['order_dir']
-            );
-
-            $resultado = $this->LocacoesService->listar($limite, $pagina, $filtros, $data_inicio, $data_fim);
+            $resultado = $this->LocacoesService->listar($params);
 
             return $this->response->setJSON([
                 'success' => true,
                 ...$resultado,
-                'filtros' => $filtros,
-                // 'recebidos' => $this->request->getGet()
+                // 'registros' => $resultado['registros'],
+                // 'paginacao' => $resultado['paginacao'],
+                'filtros' => $params['filtros'],
             ]);
 
         } catch (\Exception $e) {

@@ -11,9 +11,33 @@ class LocacoesException extends Exception
         return new self('Locação não encontrada', 404);
     }
 
-    public static function nomeObrigatorio(): self
+    public static function precoInvalido(): self
     {
-        return new self('O campo nome é obrigatório', 400);
+        return new self(
+            'O preço da diária deve ser um valor válido maior ou igual a zero.',
+            400
+        );
+    }
+
+    public static function statusInvalido(): self
+    {
+        return new self(
+            'Status inválido. Valores permitidos: disponivel, alugado, manutencao, inativo.',
+            400
+        );
+    }
+
+    public static function itemMuitoLongo(): self
+    {
+        return new self(
+            'O nome do item não pode ter mais de 255 caracteres.',
+            400
+        );
+    }
+
+    public static function campoObrigatorio($campo): self
+    {
+        return new self('O campo ' . $campo . ' é obrigatório', 400);
     }
 
 

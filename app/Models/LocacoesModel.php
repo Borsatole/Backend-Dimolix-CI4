@@ -15,6 +15,7 @@ class LocacoesModel extends Model
     protected $returnType = 'array';
     protected $useSoftDeletes = false;
     protected $protectFields = true;
+
     protected $allowedFields = [
         'cliente_id',
         'locacao_item_id',
@@ -26,6 +27,7 @@ class LocacoesModel extends Model
         'observacoes',
         'status',
     ];
+
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
@@ -39,7 +41,7 @@ class LocacoesModel extends Model
     protected array $castHandlers = [];
 
     // Dates
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $dateFormat = 'datetime';
     protected $createdField = 'created_at';
     protected $updatedField = 'updated_at';
@@ -47,7 +49,10 @@ class LocacoesModel extends Model
 
     // Validation
     protected $validationRules = [
-        'forma_pagamento' => 'in_list[debito,credito,dinheiro]|nullable',
+        'cliente_id' => 'required|is_natural_no_zero',
+        'locacao_item_id' => 'required|is_natural_no_zero',
+        'endereco_id' => 'required|is_natural_no_zero',
+        'forma_pagamento' => 'in_list[debito,credito,dinheiro]',
     ];
     protected $validationMessages = [];
     protected $skipValidation = false;
