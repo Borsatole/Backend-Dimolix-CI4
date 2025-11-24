@@ -27,7 +27,8 @@ class LocacoesController extends BaseController
     {
         try {
             $params = $this->getRequestFilters($this->request, [
-                'pagination' => true
+                'pagination' => true,
+                'dates' => true,
             ]);
 
             $resultado = $this->service->listar($params);

@@ -12,7 +12,8 @@ trait TratarErroTrait
 
         return $this->response->setJSON([
             'success' => false,
-            'message' => 'Erro interno do servidor',
+            'message' => $e->getMessage(),
+            // 'message' => 'Erro interno do servidor',
             'error' => ENVIRONMENT === 'development' ? $e->getMessage() : null
         ])->setStatusCode(500);
     }

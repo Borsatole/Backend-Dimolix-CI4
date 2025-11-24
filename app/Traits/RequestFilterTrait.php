@@ -46,8 +46,9 @@ trait RequestFilterTrait
 
         // 🔹 DATAS
         if ($options['dates']) {
-            $result['data_inicio'] = $request->getGet('data_inicio') ?: null;
-            $result['data_fim'] = $request->getGet('data_fim') ?: null;
+            $result['dia'] = $request->getGet('dia') ?: null;
+            $result['data_minima'] = $request->getGet('data_minima') ?: null;
+            $result['data_maxima'] = $request->getGet('data_maxima') ?: null;
         }
 
         // 🔹 ORDENAÇÃO

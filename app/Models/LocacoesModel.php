@@ -35,9 +35,6 @@ class LocacoesModel extends Model
 
     protected array $casts = [
         'id' => 'int',
-        'cliente_id' => 'int',
-        'locacao_item_id' => 'int',
-        'endereco_id' => 'int',
     ];
     protected array $castHandlers = [];
 
@@ -53,10 +50,33 @@ class LocacoesModel extends Model
         'cliente_id' => 'required|is_natural_no_zero',
         'locacao_item_id' => 'required|is_natural_no_zero',
         'endereco_id' => 'required|is_natural_no_zero',
-        'forma_pagamento' => 'in_list[debito,credito,dinheiro]',
+        'preco_total' => 'required|numeric',
+        'forma_pagamento' => 'in_list[dinheiro,credito,debito,pix,outro]',
     ];
     protected $validationMessages = [
-        'forma_pagamento' => '{field} deve ser um dos seguintes: debito,credito,dinheiro',
+        'cliente_id' => [
+            'required' => 'Cliente é obrigatório'
+        ],
+        'locacao_item_id' => [
+            'required' => 'Item de locação é obrigatório'
+        ],
+        'endereco_id' => [
+            'required' => 'Endereço é obrigatório',
+            'numeric' => 'Endereço deve ser um número válido'
+        ],
+        'forma_pagamento' => [
+            'in_list' => 'Forma de pagamento deve ser um de: dinheiro, credito, debito, pix, outro'
+        ],
+        'data_inicio' => [
+            'required' => 'Data de início é obrigatória'
+        ],
+        'data_fim' => [
+            'required' => 'Data de fim é obrigatória'
+        ],
+        'preco_total' => [
+            'required' => 'Preço total é obrigatório',
+            'numeric' => 'Preço total deve ser um número válido'
+        ]
     ];
     protected $skipValidation = false;
     protected $cleanValidationRules = true;
@@ -75,13 +95,42 @@ class LocacoesModel extends Model
 
     public function buscarLocacaoPorItemId(int $itemId): ?array
     {
-        return $this->select('locacoes.*, enderecos.*, clientes.nome as cliente_nome')
+        return $this->select('
+            locacoes.id AS locacao_id,
+            locacoes.cliente_id,
+            locacoes.locacao_item_id,
+            locacoes.endereco_id,
+            locacoes.data_inicio,
+            locacoes.data_fim,
+            locacoes.data_retirada,
+            locacoes.preco_total,
+            locacoes.forma_pagamento,
+            locacoes.observacoes,
+            locacoes.status,
+            locacoes.created_at,
+            locacoes.updated_at,
+
+            enderecos.cep,
+            enderecos.logradouro,
+            enderecos.numero,
+            enderecos.complemento,
+            enderecos.bairro,
+            enderecos.cidade,
+            enderecos.estado,
+
+            clientes.nome AS cliente_nome,
+            clientes.telefone AS cliente_telefone,
+            itens_locacoes.item AS item_nome,
+            itens_locacoes.categoria AS item_categoria,
+        ')
             ->join('enderecos', 'enderecos.id = locacoes.endereco_id')
             ->join('clientes', 'clientes.id = locacoes.cliente_id')
+            ->join('itens_locacoes', 'itens_locacoes.id = locacoes.locacao_item_id')
             ->where('locacoes.locacao_item_id', $itemId)
             ->where('locacoes.status', 'ativo')
             ->first();
     }
+
 
     public function verificaSeJaEstaLocado(int $itemId): ?array
     {

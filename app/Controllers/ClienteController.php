@@ -28,7 +28,8 @@ class ClienteController extends BaseController
         try {
             $params = $this->getRequestFilters($this->request, [
                 'pagination' => true,
-                'dynamic' => true
+                'dynamic' => true,
+                'ordering' => true
             ]);
 
             $resultado = $this->service->listar($params);

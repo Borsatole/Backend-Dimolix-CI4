@@ -23,9 +23,32 @@ class LocacoesService
 
     public function listar(array $params): array
     {
-        return isset($params['pagina'], $params['limite'])
+        $registro = isset($params['pagina'], $params['limite'])
             ? $this->model->listarComPaginacao($params)
             : $this->model->listarSemPaginacao($params);
+
+        $itens = $registro['registros'];
+
+        $itensProcessados = [];
+
+        foreach ($itens as $item) {
+            if (!isset($item['id'])) {
+                $item['dados_locacao'] = [];
+                $itensProcessados[] = $item;
+                continue;
+            }
+
+            $item['dados_locacao'] = $this->model->buscarLocacaoPorItemId($item['locacao_item_id']) ?? [];
+            $itensProcessados[] = $item;
+            }
+
+            $itens = $itensProcessados;
+             $registro['registros'] = $itens;
+            
+
+
+        return $registro;
+    
     }
 
 
@@ -43,6 +66,7 @@ class LocacoesService
 
     public function criar(array $dados): array
     {
+        $this->db->transStart();
         $this->validarCampoObrigatorio($dados, 'locacao_item_id');
 
         $permitidos = $this->model->allowedFields;
@@ -58,18 +82,26 @@ class LocacoesService
             throw MessagesException::erroGenerico('Item já está locado.');
         }
 
-        $this->itemModel->mudarStatusItem($locacao_item_id, 'locado');
+        
 
         if (!$this->model->criar($dadosCriar)) {
             throw MessagesException::erroCriar($this->model->errors());
         }
+        $this->itemModel->mudarStatusItem($locacao_item_id, 'locado');
 
         $id = $this->model->getInsertID();
+
+        $this->db->transComplete();
+
+        if (!$this->db->transStatus()) {
+            throw MessagesException::erroAtualizar(['Erro na transação']);
+        }
         return $this->buscar($id);
     }
 
     public function atualizar(int $id, array $dados): array
     {
+
         $registro = $this->model->buscarPorId($id)
             ?? throw MessagesException::naoEncontrado($id);
 
@@ -91,6 +123,8 @@ class LocacoesService
         if (!$this->model->atualizar($id, $dadosAtualizar)) {
             throw MessagesException::erroAtualizar($this->model->errors());
         }
+
+
 
         return $this->buscar($id);
     }
@@ -122,7 +156,6 @@ class LocacoesService
 
         return true;
     }
-
 
     private function validarCampoObrigatorio(array $dados, string $campo): void
     {

@@ -33,13 +33,22 @@ trait PaginacaoTrait
             }
         }
 
-        // 🔹 FILTRO POR DATA COM VALIDAÇÃO
-        if (!empty($params['data_inicio']) && $this->validarData($params['data_inicio'])) {
-            $builder->where("{$campoData} >=", $params['data_inicio'] . ' 00:00:00');
+        // 🔹 FILTRO POR DIA (data_inicio OU data_fim)
+        if (!empty($params['dia']) && $this->validarData($params['dia'])) {
+            $builder->groupStart()
+                ->where('data_inicio', $params['dia'])
+                ->orWhere('data_fim', $params['dia'])
+                ->where('status', 'ativo')
+                ->groupEnd();
         }
 
-        if (!empty($params['data_fim']) && $this->validarData($params['data_fim'])) {
-            $builder->where("{$campoData} <=", $params['data_fim'] . ' 23:59:59');
+        // 🔹 FILTRO POR DATA COM VALIDAÇÃO
+        if (!empty($params['data_minima']) && $this->validarData($params['data_minima'])) {
+            $builder->where("{$campoData} >=", $params['data_minima'] . ' 00:00:00');
+        }
+
+        if (!empty($params['data_maxima']) && $this->validarData($params['data_maxima'])) {
+            $builder->where("{$campoData} <=", $params['data_maxima'] . ' 23:59:59');
         }
 
         // 🔹 ORDENAÇÃO COM VALIDAÇÃO
@@ -116,7 +125,7 @@ trait PaginacaoTrait
         $limite = (int) ($params['limite'] ?? 10);
         $pagina = (int) ($params['pagina'] ?? 1);
 
-        $limite = min(max($limite, 1), 100);
+        $limite = min(max($limite, 1), 500);
         $pagina = max($pagina, 1);
 
         $builder = $this;

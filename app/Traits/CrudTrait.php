@@ -11,27 +11,16 @@ trait CrudTrait
 
     public function criar(array $dados): int
     {
-        return $this->insert($this->limparDados($dados));
+        return $this->insert($dados, true);
     }
 
     public function atualizar(int $id, array $dados): bool
     {
-        return $this->update($id, $this->limparDados($dados));
+        return $this->update($id, $dados);
     }
 
     public function deletar(int $id): bool
     {
         return $this->delete($id);
     }
-
-    private function limparDados(array $dados): array
-    {
-        foreach ($dados as $chave => $valor) {
-            if ($valor === '' || $valor === ' ') {
-                $dados[$chave] = null;
-            }
-        }
-        return $dados;
-    }
 }
-
