@@ -29,8 +29,8 @@ trait RequestFilterTrait
         $result = [
             'limite' => null,
             'pagina' => null,
-            'data_inicio' => null,
-            'data_fim' => null,
+            'data_minima' => null,
+            'data_maxima' => null,
             'order_by' => null,
             'order_dir' => null,
             'filtros' => [],
@@ -66,8 +66,8 @@ trait RequestFilterTrait
         }
 
         if ($options['dates']) {
-            $ignore[] = 'data_inicio';
-            $ignore[] = 'data_fim';
+            $ignore[] = 'data_minima';
+            $ignore[] = 'data_maxima';
         }
 
         if ($options['ordering']) {

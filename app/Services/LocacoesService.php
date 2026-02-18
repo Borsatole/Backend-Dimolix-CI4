@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\LocacoesModel;
 use App\Models\ItensLocacoesModel;
+use App\Models\AgendamentosModel;
 use App\Exceptions\MessagesException;
 use Config\Database;
 
@@ -11,12 +12,14 @@ class LocacoesService
 {
     private LocacoesModel $model;
     private ItensLocacoesModel $itemModel;
+    private AgendamentosModel $agendamentosModel;
     private $db;
 
     public function __construct()
     {
         $this->model = new LocacoesModel();
         $this->itemModel = new ItensLocacoesModel();
+        $this->agendamentosModel = new AgendamentosModel();
         $this->db = Database::connect();
     }
 
@@ -40,15 +43,15 @@ class LocacoesService
 
             $item['dados_locacao'] = $this->model->buscarLocacaoPorItemId($item['locacao_item_id']) ?? [];
             $itensProcessados[] = $item;
-            }
+        }
 
-            $itens = $itensProcessados;
-             $registro['registros'] = $itens;
-            
+        $itens = $itensProcessados;
+        $registro['registros'] = $itens;
+
 
 
         return $registro;
-    
+
     }
 
 
@@ -67,37 +70,92 @@ class LocacoesService
     public function criar(array $dados): array
     {
         $this->db->transStart();
-        $this->validarCampoObrigatorio($dados, 'locacao_item_id');
 
-        $permitidos = $this->model->allowedFields;
-        $dadosCriar = $this->filtrarCamposPermitidos($dados, $permitidos);
+        // 🔹 SE VEIO DE AGENDAMENTO
+        if (isset($dados['agendamento_id'])) {
 
-        if (empty($dadosCriar)) {
-            throw MessagesException::erroCriar(['Nenhum campo válido foi enviado.']);
+            $agendamento = $this->agendamentosModel->buscarPorId($dados['agendamento_id']);
+
+            if (!$agendamento) {
+                throw MessagesException::erroGenerico('Agendamento não encontrado.');
+            }
+
+            if ($agendamento['data_inicio'] > date('Y-m-d H:i:s')) {
+                throw MessagesException::erroGenerico('Agendamento ainda não pode ser convertido em locação. Data de início é no futuro.');
+            }
+
+            $categoriaItem = $agendamento['categoria_item'] ?? null;
+
+            $itemDisponivel = $this->
+                buscarItemNaoLocadoPorCategoria($categoriaItem);
+
+            if (!$itemDisponivel) {
+                throw MessagesException::erroGenerico('Todos os itens estão locados.');
+            }
+
+            // monta dados da locação automaticamente
+            $dadosCriar = [
+                'locacao_item_id' => $itemDisponivel['id'],
+                'cliente_id' => $agendamento['cliente_id'],
+                'endereco_id' => $agendamento['endereco_id'],
+                'data_inicio' => $agendamento['data_inicio'],
+                'data_fim' => $agendamento['data_fim'],
+                'preco_total' => $agendamento['preco_total'],
+                'forma_pagamento' => $agendamento['forma_pagamento'],
+                'observacoes' => $agendamento['observacoes'],
+                'agendamento_id' => $agendamento['id'],
+            ];
+
+        } else {
+
+            $this->validarCampoObrigatorio($dados, 'locacao_item_id');
+
+            $permitidos = $this->model->allowedFields;
+            $dadosCriar = $this->filtrarCamposPermitidos($dados, $permitidos);
+
+            if (empty($dadosCriar)) {
+                throw MessagesException::erroCriar(['Nenhum campo válido foi enviado.']);
+            }
+
+            $locacao_item_id = $dadosCriar['locacao_item_id'];
+
+            if ($this->model->verificaSeJaEstaLocado($locacao_item_id)) {
+                throw MessagesException::erroGenerico('Item já está locado.');
+            }
+        }
+
+        // 🔹 CRIA LOCAÇÃO
+        if (!$this->model->criar($dadosCriar)) {
+            throw MessagesException::erroCriar($this->model->errors());
         }
 
         $locacao_item_id = $dadosCriar['locacao_item_id'];
 
-        if ($this->model->verificaSeJaEstaLocado($locacao_item_id)) {
-            throw MessagesException::erroGenerico('Item já está locado.');
-        }
-
-        
-
-        if (!$this->model->criar($dadosCriar)) {
-            throw MessagesException::erroCriar($this->model->errors());
-        }
+        // 🔹 MUDA STATUS DO ITEM
         $this->itemModel->mudarStatusItem($locacao_item_id, 'locado');
 
         $id = $this->model->getInsertID();
+
+        if (isset($agendamento)) {
+            $this->agendamentosModel->deletar($agendamento['id']);
+        }
 
         $this->db->transComplete();
 
         if (!$this->db->transStatus()) {
             throw MessagesException::erroAtualizar(['Erro na transação']);
         }
+
         return $this->buscar($id);
     }
+
+    public function buscarItemNaoLocadoPorCategoria(string $categoria)
+    {
+        return $this->itemModel->where('categoria', $categoria)
+            ->where('status', 'disponivel')
+            ->first();
+    }
+
 
     public function atualizar(int $id, array $dados): array
     {

@@ -182,6 +182,134 @@ $routes->group('locacoes', ['filter' => 'autenticacao'], function ($routes) {
     );
 });
 
+// Rota de agendamentos
+$routes->group('agendamentos', ['filter' => 'autenticacao'], function ($routes) {
+    $routes->get(
+        '',
+        'AgendamentosController::index',
+        ['filter' => 'permission:enderecos.visualizar']
+    );
+
+    $routes->post(
+        '',
+        'AgendamentosController::create',
+        ['filter' => 'permission:enderecos.criar']
+    );
+
+    $routes->get(
+        '(:num)',
+        'AgendamentosController::show/$1',
+        ['filter' => 'permission:enderecos.visualizar']
+    );
+
+    $routes->put(
+        '(:num)',
+        'AgendamentosController::update/$1',
+        ['filter' => 'permission:enderecos.editar']
+    );
+
+    $routes->delete(
+        '(:num)',
+        'AgendamentosController::delete/$1',
+        ['filter' => 'permission:enderecos.excluir']
+    );
+});
+
+$routes->group('financeiro', ['filter' => 'autenticacao'], function ($routes) {
+    $routes->get(
+        '',
+        'FinanceiroController::index',
+        ['filter' => 'permission:enderecos.visualizar']
+    );
+
+    $routes->post(
+        '',
+        'FinanceiroController::create',
+        ['filter' => 'permission:enderecos.criar']
+    );
+
+    $routes->get(
+        '(:num)',
+        'FinanceiroController::show/$1',
+        ['filter' => 'permission:enderecos.visualizar']
+    );
+
+    $routes->put(
+        '(:num)',
+        'FinanceiroController::update/$1',
+        ['filter' => 'permission:enderecos.editar']
+    );
+
+    $routes->delete(
+        '(:num)',
+        'FinanceiroController::delete/$1',
+        ['filter' => 'permission:enderecos.excluir']
+    );
+});
+$routes->group('financeiro-categorias', ['filter' => 'autenticacao'], function ($routes) {
+    $routes->get(
+        '',
+        'CategoriaFinanceiroController::index',
+        ['filter' => 'permission:enderecos.visualizar']
+    );
+
+    $routes->post(
+        '',
+        'CategoriaFinanceiroController::create',
+        ['filter' => 'permission:enderecos.criar']
+    );
+
+    $routes->get(
+        '(:num)',
+        'CategoriaFinanceiroController::show/$1',
+        ['filter' => 'permission:enderecos.visualizar']
+    );
+
+    $routes->put(
+        '(:num)',
+        'CategoriaFinanceiroController::update/$1',
+        ['filter' => 'permission:enderecos.editar']
+    );
+
+    $routes->delete(
+        '(:num)',
+        'CategoriaFinanceiroController::delete/$1',
+        ['filter' => 'permission:enderecos.excluir']
+    );
+});
+
+$routes->group('financeiro-contas-fixas', ['filter' => 'autenticacao'], function ($routes) {
+    $routes->get(
+        '',
+        'FinanceiroContasFixasController::index',
+        ['filter' => 'permission:enderecos.visualizar']
+    );
+
+    $routes->post(
+        '',
+        'FinanceiroContasFixasController::create',
+        ['filter' => 'permission:enderecos.criar']
+    );
+
+    $routes->get(
+        '(:num)',
+        'FinanceiroContasFixasController::show/$1',
+        ['filter' => 'permission:enderecos.visualizar']
+    );
+
+    $routes->put(
+        '(:num)',
+        'FinanceiroContasFixasController::update/$1',
+        ['filter' => 'permission:enderecos.editar']
+    );
+
+    $routes->delete(
+        '(:num)',
+        'FinanceiroContasFixasController::delete/$1',
+        ['filter' => 'permission:enderecos.excluir']
+    );
+});
+
 // Rotas de Niveis
 $routes->group('papeis', ['filter' => 'autenticacao'], function ($routes) {
     $routes->get(

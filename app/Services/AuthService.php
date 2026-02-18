@@ -37,10 +37,6 @@ class AuthService
             throw AuthException::naoExiste();
         }
 
-        // if (!$usuario['ativo']) {
-        //     throw AuthException::naoAtivo();
-        // }
-
         if (!$this->validarSenha($senha, $usuario['senha'])) {
             throw AuthException::senhaIncorreta();
         }
@@ -57,33 +53,6 @@ class AuthService
         $token = $this->gerarJWT($payload);
         $menu = $usuario['ativo'] ? $this->buscaMenu($usuario) : [];
         $expirationTime = $payload['exp'];
-
-        // enviarEmailSimples(
-        //     // para
-        //     'vitoriabotacini7@gmail.com',
-
-        //     // assunto
-        //     '🎉 O soca é do paaaai',
-
-        //     // mensagem
-        //     "Olá Selma Piruleibe, Só pra falar que o xoca é do pai"
-        // );
-
-
-        // $sucesso = enviarEmailTemplate(
-        //     // template
-        //     'boas_vindas',
-
-        //     // variaveis
-        //     ['nome' => 'Selma Piruleibe', 'codigo' => '123456'],
-
-        //     // para
-        //     // $usuario['email'], 
-        //     'vitoriabotacini7@gmail.com',
-
-        //     // assunto
-        //     '🎉 Bem-vindo à PlayNet!');
-
 
 
 
@@ -103,11 +72,14 @@ class AuthService
 
     private function criarPayloadJWT(array $usuario): array
     {
+        $horas = env('JWT_EXPIRATION_HOURS', 1);
+        $minutos = env('JWT_EXPIRATION_MINUTES', 0);
+        $segundos = env('JWT_EXPIRATION_SECONDS', 0);
+
         return [
             'iss' => base_url(),
             'iat' => time(),
-            // 'exp' => time() + 3600,
-            'exp' => time() + 43200,
+            'exp' => time() + ($horas * 3600) + ($minutos * 60) + $segundos,
             'sub' => $usuario['id'],
             'nivel' => $usuario['nivel']
         ];
