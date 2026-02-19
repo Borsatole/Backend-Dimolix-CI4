@@ -1,0 +1,20 @@
+# Dependências
+/vendor/
+/node_modules/
+
+# Arquivos sensíveis
+.env
+
+# Logs e cache
+/writable/cache/*
+/writable/logs/*
+/writable/session/*
+/writable/uploads/*
+
+# Build front-end
+/public/build/
+/public/dist/
+
+# IDE
+.vscode/
+.idea/
