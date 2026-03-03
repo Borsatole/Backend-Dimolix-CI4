@@ -72,7 +72,7 @@ class AuthService
 
     private function criarPayloadJWT(array $usuario): array
     {
-        $horas = env('JWT_EXPIRATION_HOURS', 1);
+        $horas = env('JWT_EXPIRATION_HOURS', 25);
         $minutos = env('JWT_EXPIRATION_MINUTES', 0);
         $segundos = env('JWT_EXPIRATION_SECONDS', 0);
 

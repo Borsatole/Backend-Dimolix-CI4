@@ -4,6 +4,10 @@ namespace App\Traits;
 
 trait CrudTrait
 {
+    public function listar(): array
+    {
+        return $this->findAll();
+    }
     public function buscarPorId(int $id): ?array
     {
         return $this->find($id);

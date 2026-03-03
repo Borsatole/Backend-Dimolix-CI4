@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\FinanceiroContasFixasModel;
+use App\Models\CategoriaFinanceiroModel;
 
 use App\Exceptions\MessagesException;
 use Config\Database;
@@ -10,12 +11,15 @@ use Config\Database;
 class FinanceiroContasFixasService
 {
     private FinanceiroContasFixasModel $model;
+    private CategoriaFinanceiroModel $categoriaModel;
 
     private $db;
 
     public function __construct()
     {
         $this->model = new FinanceiroContasFixasModel();
+
+        $this->categoriaModel = new CategoriaFinanceiroModel();
 
         $this->db = Database::connect();
     }
@@ -25,9 +29,24 @@ class FinanceiroContasFixasService
     {
         $campoData = 'created_at';
 
+        $categorias = $this->categoriaModel->
+            where('tipo', 'saida')->
+            listar();
+
+        $formasPagamento = [
+            'Dinheiro',
+            'Cartão de Crédito',
+            'Cartão de Débito',
+        ];
+
         $registro = isset($params['pagina'], $params['limite'])
             ? $this->model->listarComPaginacao($params, $campoData)
             : $this->model->listarSemPaginacao($params, $campoData);
+
+        $registro['categorias'] = $categorias;
+        $registro['formasPagamento'] = $formasPagamento;
+
+
 
 
         return $registro;
