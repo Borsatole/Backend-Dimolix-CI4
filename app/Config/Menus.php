@@ -16,16 +16,19 @@ return [
                     'id' => 41,
                     'nome' => 'Visão geral',
                     'rota' => '/financeiro',
+                    'icone' => 'dashboard',
                 ],
                 [
                     'id' => 42,
                     'nome' => 'Contas a pagar',
                     'rota' => '/financeiro/pagar',
+                    'icone' => 'contasapagar',
                 ],
                 [
                     'id' => 43,
                     'nome' => 'Contas a receber',
                     'rota' => '/financeiro/receber',
+                    'icone' => 'contasareceber',
                 ],
                 [
                     'id' => 44,

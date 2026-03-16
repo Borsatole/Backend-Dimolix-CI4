@@ -310,6 +310,38 @@ $routes->group('financeiro-contas-fixas', ['filter' => 'autenticacao'], function
     );
 });
 
+$routes->group('financeiro-contas-receber', ['filter' => 'autenticacao'], function ($routes) {
+    $routes->get(
+        '',
+        'FinanceiroContasReceberController::index',
+        ['filter' => 'permission:enderecos.visualizar']
+    );
+
+    $routes->post(
+        '',
+        'FinanceiroContasReceberController::create',
+        ['filter' => 'permission:enderecos.criar']
+    );
+
+    $routes->get(
+        '(:num)',
+        'FinanceiroContasReceberController::show/$1',
+        ['filter' => 'permission:enderecos.visualizar']
+    );
+
+    $routes->put(
+        '(:num)',
+        'FinanceiroContasReceberController::update/$1',
+        ['filter' => 'permission:enderecos.editar']
+    );
+
+    $routes->delete(
+        '(:num)',
+        'FinanceiroContasReceberController::delete/$1',
+        ['filter' => 'permission:enderecos.excluir']
+    );
+});
+
 // Rotas de Niveis
 $routes->group('papeis', ['filter' => 'autenticacao'], function ($routes) {
     $routes->get(

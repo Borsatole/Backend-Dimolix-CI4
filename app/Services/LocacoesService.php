@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\LocacoesModel;
 use App\Models\ItensLocacoesModel;
 use App\Models\AgendamentosModel;
+use App\Models\FinanceiroModel;
+use App\Models\ClienteModel;
 use App\Exceptions\MessagesException;
 use Config\Database;
 
@@ -13,6 +15,8 @@ class LocacoesService
     private LocacoesModel $model;
     private ItensLocacoesModel $itemModel;
     private AgendamentosModel $agendamentosModel;
+    private FinanceiroModel $financeiroModel;
+    private ClienteModel $clienteModel;
     private $db;
 
     public function __construct()
@@ -20,6 +24,8 @@ class LocacoesService
         $this->model = new LocacoesModel();
         $this->itemModel = new ItensLocacoesModel();
         $this->agendamentosModel = new AgendamentosModel();
+        $this->financeiroModel = new FinanceiroModel();
+        $this->clienteModel = new ClienteModel();
         $this->db = Database::connect();
     }
 
@@ -165,13 +171,32 @@ class LocacoesService
 
         $permitidos = $this->model->allowedFields;
 
+        $lancarFinanceiro = $dados['lancar_financeiro'] ?? true;
+
+        $cliente = $this->clienteModel->buscarPorId($registro['cliente_id']);
+        $item = $this->itemModel->buscarPorId($registro['locacao_item_id']);
+
         $dadosAtualizar = $this->filtrarCamposPermitidos($dados, $permitidos);
 
         $status = $dadosAtualizar['status'] ?? null;
 
+
         if ($status === 'finalizado') {
             $locacao_item_id = $registro['locacao_item_id'];
             $this->itemModel->mudarStatusItem($locacao_item_id, 'disponivel');
+
+            if ($lancarFinanceiro) {
+                $this->financeiroModel->insert([
+                    'descricao' => mb_strtolower("locacao {$cliente['nome']} {$item['categoria']}"),
+                    'id_categoria' => '1',
+                    'data_movimentacao' => date('Y-m-d'),
+                    'valor' => $registro['preco_total'],
+                    'tipo_movimentacao' => 'entrada',
+                    'forma_pagamento' => $registro['forma_pagamento'],
+                    'status' => 'concluido'
+                ]);
+            }
+
         }
 
         if (empty($dadosAtualizar)) {

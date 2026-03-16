@@ -109,6 +109,12 @@ class CategoriaFinanceiroService
         $registro = $this->model->buscarPorId($id)
             ?? throw MessagesException::naoEncontrado($id);
 
+        $estausada = $this->verificaSeCategoriaEstaSendoUsada($id);
+
+        if ($estausada) {
+            throw MessagesException::erroGenerico('Há financeiros cadastrados nesta categoria, impossível deletar.');
+        }
+
 
         if (!$this->model->deletar($id)) {
             $this->db->transRollback();
@@ -123,6 +129,15 @@ class CategoriaFinanceiroService
         }
 
         return true;
+    }
+
+    private function verificaSeCategoriaEstaSendoUsada(int $id): bool
+    {
+        return $this->db
+            ->table('financeiro')
+            ->where('id_categoria', $id)
+            ->where('deleted_at', null)
+            ->countAllResults() > 0;
     }
 
     private function validarCampoObrigatorio(array $dados, string $campo): void

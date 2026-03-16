@@ -33,11 +33,8 @@ class FinanceiroContasFixasService
             where('tipo', 'saida')->
             listar();
 
-        $formasPagamento = [
-            'Dinheiro',
-            'Cartão de Crédito',
-            'Cartão de Débito',
-        ];
+        $config = config('FormasPagamento');
+        $formasPagamento = $config->formas;
 
         $registro = isset($params['pagina'], $params['limite'])
             ? $this->model->listarComPaginacao($params, $campoData)
