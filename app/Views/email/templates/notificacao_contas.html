@@ -1,0 +1,47 @@
+<h2 style="font-family: Arial, sans-serif; color:#333;">
+    📊 Contas pendentes
+</h2>
+
+<table style="
+    width:100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+    font-size:14px;
+">
+
+    <thead>
+        <tr style="background-color:#f5f5f5;">
+            <th style="padding:10px; text-align:left; border-bottom:2px solid #ddd;">
+                Descrição
+            </th>
+
+            <th style="padding:10px; text-align:left; border-bottom:2px solid #ddd;">
+                Vencimento
+            </th>
+
+            <th style="padding:10px; text-align:right; border-bottom:2px solid #ddd;">
+                Valor
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {{tabela_contas}}
+    </tbody>
+
+</table>
+
+<div style="
+    margin-top:20px;
+    padding:12px;
+    background:#f8f9fa;
+    border:1px solid #eee;
+    border-radius:6px;
+    font-family: Arial, sans-serif;
+">
+
+    <strong style="font-size:16px;">
+        Total: R$ {{total_contas}}
+    </strong>
+
+</div>
