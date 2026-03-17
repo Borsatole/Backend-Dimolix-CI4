@@ -17,11 +17,18 @@ class Rotinas
 {
     public static function registrar(Schedule $schedule)
     {
+        $schedule->comando('limpeza:limpar-logs')
+            ->aCadaMinutos(60);
+
+        // $schedule->comando('financeiro:gerar-notificacao')
+        //     ->todoDiaAs('6:00');
+        $schedule->comando('financeiro:gerar-notificacao')
+            ->aCadaMinutos(1);
+
         $schedule->comando('financeiro:gerar-contas')
             ->todoMes(1, '6:00');
 
-        $schedule->comando('financeiro:gerar-notificacao')
-            ->todoDiaAs('6:00');
+
     }
 }
 

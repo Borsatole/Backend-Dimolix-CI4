@@ -67,6 +67,8 @@ class GerarNotificacaoContasDoDia extends BaseCommand
 
         $totalFormatado = number_format($total, 2, ',', '.');
 
+        $adminEmail = env('ADMIN_EMAIL') ?? 'borsatole@gmail.com';
+
         // enviar email
         enviarEmailTemplate(
             'notificacao_contas',
@@ -74,7 +76,7 @@ class GerarNotificacaoContasDoDia extends BaseCommand
                 'tabela_contas' => $tabela,
                 'total_contas' => $totalFormatado
             ],
-            'borsatole@gmail.com',
+            $adminEmail,
             "📊 R$" . number_format($total, 2, ',', '.') . " em contas pendentes de pagamento hoje"
         );
 
